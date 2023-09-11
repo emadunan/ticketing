@@ -1,0 +1,19 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: ticketing
+
+build:
+  artifacts:
+    - image: emadunan/ticketing-auth
+      context: auth
+      docker:
+        dockerfile: Dockerfile
+  local:
+    push: false
+
+manifests:
+  rawYaml:
+    - k8s/*
+deploy:
+  kubectl: {}
