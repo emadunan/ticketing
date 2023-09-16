@@ -2,6 +2,8 @@ import request from "supertest";
 import app from "../../app";
 import { Ticket } from "../../models/ticket";
 
+import { natsWrapper } from "../../nats-wrapper";
+
 describe('POST /api/tickets', () => {
   it("should listening to /api/tickets for post requests", async () => {
     const response = await request(app)
@@ -63,13 +65,26 @@ describe('POST /api/tickets', () => {
       .set("Cookie", global.signup())
       .send({ title, price })
       .expect(201);
-      
+
     expect(typeof response.body.id).toBe("string");
 
     tickets = await Ticket.find({});
     expect(tickets.length).toBe(1);
     expect(tickets[0].price).toBe(price);
     expect(tickets[0].title).toBe(title);
+  });
+
+  it("should publishes an event", async () => {
+    const title = "book";
+    const price = 10;
+
+    await request(app)
+      .post("/api/tickets")
+      .set("Cookie", global.signup())
+      .send({ title, price })
+      .expect(201);
+
+    expect(natsWrapper.client.publish).toHaveBeenCalled();
   });
 
 });
