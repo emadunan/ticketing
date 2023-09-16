@@ -9,6 +9,7 @@ build:
       context: auth
       docker:
         dockerfile: Dockerfile
+        noCache: true
       sync:
         manual:
           - dest: .
